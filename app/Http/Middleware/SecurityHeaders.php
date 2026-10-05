@@ -34,7 +34,7 @@ class SecurityHeaders
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; " .
             "font-src 'self' https://fonts.gstatic.com; " .
             "img-src 'self' data: blob: https:; " .
-            "connect-src 'self'; " .
+            "connect-src 'self' http://localhost:5173 http://127.0.0.1:5173; " .
             "frame-src 'self' https://www.google.com https://maps.google.com https://www.openstreetmap.org; " .
             "object-src 'none'; " .
             "base-uri 'self';"

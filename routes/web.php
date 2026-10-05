@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Welcome API status page for backend server root
+Route::get('/', function () {
+    return view('welcome');
+});
+
 // Health check endpoint
 Route::get('/health', function () {
     return response()->json([
@@ -9,8 +14,3 @@ Route::get('/health', function () {
         'timestamp' => now()->toISOString(),
     ]);
 });
-
-// ── CATATAN ───────────────────────────────────────────────────────────────────
-// Semua API routes ada di routes/api.php (prefix /api otomatis).
-// SPA catch-all dihapus karena frontend sekarang di-serve terpisah oleh Vite/CDN.
-// ─────────────────────────────────────────────────────────────────────────────

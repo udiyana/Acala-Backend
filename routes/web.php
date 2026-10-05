@@ -1,6 +1,23 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+// ── Named route 'login' (safety net) ─────────────────────────────────────────
+// Laravel auth middleware mencari named route 'login' saat user belum login.
+// Route ini ada di sini agar tidak muncul RouteNotFoundException.
+// Untuk request API → kembalikan JSON 401.
+// Untuk request browser → redirect ke halaman CMS login di frontend.
+Route::get('/login', function (Request $request) {
+    if ($request->is('api/*') || $request->expectsJson()) {
+        return response()->json([
+            'message' => 'Unauthenticated. Login via POST /api/cms/login',
+            'errors'  => [],
+        ], 401);
+    }
+    // Browser langsung ke halaman CMS login (frontend SPA)
+    return redirect('/cms/login');
+})->name('login');
 
 // Health check endpoint
 Route::get('/health', function () {

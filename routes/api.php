@@ -29,6 +29,7 @@ Route::prefix('cms')->middleware('throttle:cms.public')->group(function () {
     Route::get('/public-datasets', [CmsDatasetController::class, 'publicIndex']);
     Route::get('/public-datasets/{key}', [CmsDatasetController::class, 'publicShow']);
     Route::get('/public-images', [CmsImageController::class, 'publicIndex']);
+    Route::get('/public-contents', [CmsContentController::class, 'index']);
 });
 
 // ── CMS Admin API ─────────────────────────────────────────────────────────────

@@ -64,57 +64,61 @@ class CmsAuthController extends Controller
             ]);
         }
 
-        // Successful login – clear lockout counter and regenerate session
+        // Successful login – clear lockout counter
         RateLimiter::clear($throttleKey);
-        $request->session()->regenerate();
+
+        // Ambil data user yang sedang aktif terautentikasi
+        $user = Auth::user();
+
+        // Buat Sanctum Token untuk autentikasi API
+        $token = $user->createToken('admin-token')->plainTextToken;
 
         Log::info('CMS login success', [
             'ip'    => $request->ip(),
             'email' => $credentials['email'],
-            'user'  => Auth::id(),
+            'user'  => $user->id,
         ]);
 
         return response()->json([
-            'message'    => 'Login berhasil.',
-            'csrf_token' => csrf_token(),
-            'user'       => [
-                'id'    => Auth::id(),
-                'name'  => Auth::user()->name,
-                'email' => Auth::user()->email,
+            'message' => 'Login berhasil.',
+            'token'   => $token,
+            'user'    => [
+                'id'    => $user->id,
+                'name'  => $user->name,
+                'email' => $user->email,
             ],
-        ])->header('X-CSRF-TOKEN', csrf_token());
+        ], 200);
     }
 
     public function logout(Request $request): JsonResponse
     {
         Log::info('CMS logout', [
             'ip'   => $request->ip(),
-            'user' => Auth::id(),
+            'user' => $request->user()?->id,
         ]);
 
-        Auth::logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // Hapus token aktif saat user melakukan logout
+        $request->user()?->currentAccessToken()?->delete();
 
         return response()->json([
-            'message'    => 'Logout berhasil.',
-            'csrf_token' => csrf_token(),
-        ])->header('X-CSRF-TOKEN', csrf_token());
+            'message' => 'Logout berhasil.',
+        ], 200);
     }
 
     public function me(Request $request): JsonResponse
     {
-        if (! Auth::check()) {
+        $user = $request->user();
+
+        if (! $user) {
             return response()->json(['authenticated' => false], 401);
         }
 
         return response()->json([
             'authenticated' => true,
             'user'          => [
-                'id'    => Auth::id(),
-                'name'  => Auth::user()->name,
-                'email' => Auth::user()->email,
+                'id'    => $user->id,
+                'name'  => $user->name,
+                'email' => $user->email,
             ],
         ]);
     }
